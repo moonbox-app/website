@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact | MoonBox</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+    <style>
+      :root {
+        --accent: #80fe01;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/contact">Contact</a>
+      </nav>
+
+      <h1>Contact</h1>
+    </header>
+
+    <main>
+      <code id="form-status" hidden></code>
+
+      <form id="form" action="https://formspree.io/f/mgedznzr" method="POST">
+        <p>
+          <label>Email</label>
+          <br />
+          <input type="email" name="email" required />
+        </p>
+
+        <p>
+          <label>Message</label>
+          <br />
+          <textarea name="message" rows="6" required></textarea>
+        </p>
+
+        <button type="submit">Send</button>
+      </form>
+
+      <script>
+        var form = document.getElementById("form");
+        var status = document.getElementById("form-status");
+
+        async function handleSubmit(event) {
+          event.preventDefault();
+          status.hidden = true;
+          status.innerHTML = "";
+          var data = new FormData(event.target);
+          fetch(event.target.action, {
+            method: form.method,
+            body: data,
+            headers: {
+              Accept: "application/json",
+            },
+          })
+            .then((response) => {
+              if (response.ok) {
+                status.hidden = false;
+                status.innerHTML = "Thanks for your submission!";
+                form.reset();
+              } else {
+                response.json().then((data) => {
+                  if (Object.hasOwn(data, "errors")) {
+                    status.hidden = false;
+                    status.innerHTML = data["errors"]
+                      .map((error) => `${error["field"]}: ${error["message"]}`)
+                      .join(", ");
+                  } else {
+                    status.hidden = false;
+                    status.innerHTML =
+                      "Oops! There was a problem submitting your form";
+                  }
+                });
+              }
+            })
+            .catch((error) => {
+              status.hidden = false;
+              status.innerHTML =
+                "Oops! There was a problem submitting your form";
+            });
+        }
+        form.addEventListener("submit", handleSubmit);
+      </script>
+    </main>
+
+    <footer>
+      <p>&copy; 2022 MoonBox</p>
+      <p>
+        <a target="_blank" href="/website-privacy-policy.pdf"
+          >Website Privacy Policy</a
+        >
+        |
+        <a target="_blank" href="/indoor-gardening/app-privacy-policy.pdf"
+          >Indoor Gardening App Privacy Policy</a
+        >
+      </p>
+    </footer>
+  </body>
+</html>
