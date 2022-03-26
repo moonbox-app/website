@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- TODO: Translations -->
+    <title>RU Feedback</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+    <style>
+      :root {
+        --bg: #e8edf0;
+        --text: black;
+        --code: black;
+        --accent: #80fe01;
+      }
+
+      code {
+        white-space: pre;
+      }
+
+      button,
+      button:hover,
+      button:active {
+        background: #e8edf0;
+        color: black;
+        border-radius: 30px;
+        box-shadow: #beccd5 3px 3px 6px, white -3px -3px 6px;
+        filter: none !important;
+        padding: 20px 30px;
+        font-weight: normal;
+      }
+
+      button:active {
+        box-shadow: inset #beccd5 3px 3px 6px, inset white -3px -3px 6px;
+      }
+
+      input,
+      textarea {
+        background: #e8edf0;
+        color: black;
+        border: none;
+        border-radius: 20px;
+        box-shadow: inset #beccd5 3px 3px 6px, inset white -3px -3px 6px;
+        filter: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <code id="form-status" hidden></code>
+
+      <!-- TODO: Translations -->
+      <form id="form" action="https://formspree.io/f/xeqnleeb" method="POST">
+        <p>
+          <label>RU Email</label>
+          <br />
+          <input type="email" name="email" />
+        </p>
+
+        <p>
+          <label>RU Message</label>
+          <br />
+          <textarea name="message" rows="6" required></textarea>
+        </p>
+
+        <button type="submit">RU Send</button>
+      </form>
+
+      <script>
+        var form = document.getElementById("form");
+        var statusEl = document.getElementById("form-status");
+
+        var successMessage = "RU Message sent!";
+        var errorMessage = `RU There was a problem sending your message. Please try again, or email us at hello${"@"}moonbox.app`;
+
+        async function handleSubmit(event) {
+          event.preventDefault();
+          statusEl.hidden = true;
+          statusEl.innerHTML = "";
+          var data = new FormData(event.target);
+          fetch(event.target.action, {
+            method: form.method,
+            body: data,
+            headers: {
+              Accept: "application/json",
+            },
+          })
+            .then((response) => {
+              if (response.ok) {
+                statusEl.hidden = false;
+                statusEl.innerHTML = successMessage;
+                form.reset();
+              } else {
+                response.json().then((data) => {
+                  let message = data.error + "\n";
+
+                  if (data.errors) {
+                    message += data.errors
+                      .map((error) => `- ${error["field"]} ${error["message"]}`)
+                      .join("\n");
+                  }
+
+                  statusEl.hidden = false;
+                  statusEl.innerHTML = message || errorMessage;
+                });
+              }
+            })
+            .catch((error) => {
+              statusEl.hidden = false;
+              statusEl.innerHTML = errorMessage;
+            });
+        }
+        form.addEventListener("submit", handleSubmit);
+      </script>
+    </main>
+  </body>
+</html>
